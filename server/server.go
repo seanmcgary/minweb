@@ -15,6 +15,7 @@ type HTTPHandler struct {
 
 type HTTPServer struct {
 	middlewares []func()
+	routes map[string]router.Route
 }
 
 func (h HTTPServer) Start(){
@@ -37,6 +38,22 @@ func (h HTTPHandler) SendJSON(j map[string]interface{}){
 
 func Create() (h HTTPServer){
 	h = HTTPServer{}
+
+	h.routes = make(map[string]router.Route)
+
+	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request){
+		fmt.Println(req.URL.Path);
+		fmt.Println(h.routes);
+
+		found := false
+		for _, value := range h.routes {
+			if(value.Match(req.URL.Path)){
+				fmt.Println("MATCHES!")
+				return
+			}
+		}
+	})
+
 	return h
 }
 
@@ -44,10 +61,14 @@ type RouteHandler func(h HTTPHandler, next func())
 
 var traverseHandlers func()
 
-func Route(uri string, handlers ...RouteHandler){
+func (h HTTPServer) Route(uri string, handlers ...RouteHandler){
 
-	fmt.Println(router.CreateRoute(uri))
+	route := router.CreateRoute(uri)
 
+	h.routes[route.UrlPattern] = route
+
+
+	/*
 	http.HandleFunc(uri, func(res http.ResponseWriter, req *http.Request) {
 		current := 0
 		handler := HTTPHandler{res, req}
@@ -69,5 +90,6 @@ func Route(uri string, handlers ...RouteHandler){
 			traverseHandlers()
 		}
 	})
+	*/
 }
 

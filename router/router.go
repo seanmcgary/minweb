@@ -2,12 +2,20 @@ package router
 
 import (
 	"regexp"
+	"github.com/seanmcgary/minweb/server"
 )
 
 type Route struct {
-	urlPattern string
-	keys []string
-	source string
+	UrlPattern string
+	Keys []string
+	Source string
+}
+
+func (r Route) Match(url string)(bool){
+	reg, _ := regexp.Compile(r.UrlPattern)
+
+	matches := reg.FindAllStringSubmatch(url, -1)
+	return len(matches) > 0
 }
 
 func CreateRoute(url string) (r Route){

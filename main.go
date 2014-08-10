@@ -18,12 +18,12 @@ func main() {
 	})
 
 	
-	server.Route("/test/:foo", testMiddleware, func(h server.HTTPHandler, next func()){
+	s.Route("/test/:foo", testMiddleware, func(h server.HTTPHandler, next func()){
 		fmt.Println("test")
 		h.Send("text from /test")
 	})
 
-	//server.Start()
+	s.Start()
 	
 
 	//reg, _ := regexp.Compile(`(\/[^/]+)`);
